@@ -1,4 +1,4 @@
-const FileUpload = require("../models/fileUploadModel.js")
+const FileUpload = require("../models/fileUploadModel.js");
 const aws = require("aws-sdk");
 
 const multer = require("multer");
@@ -38,8 +38,9 @@ exports.uploadFile = (req, res, next) => {
     uploadSingle(req, res, async (err) => {
         if (err)
             return res.status(400).json({ success: false, message: err.message });
-        let userData = await FileUpload.findOne({ _id: req.query.id });
-        let newFiles = userData.fileArray; let fileData = {
+        let userData = await FileUpload.findOne({ user: req.userId });
+        let newFiles = userData.fileArray;
+        let fileData = {
             fileName: req.file.originalname,
             fileUrl: req.file.location,
             fileKey: req.file.key,
@@ -47,7 +48,7 @@ exports.uploadFile = (req, res, next) => {
         }
         newFiles.push(fileData);
 
-        let userFiles = await FileUpload.findOneAndUpdate({ _id: req.query.id }, {
+        let userFiles = await FileUpload.findOneAndUpdate({ user: req.userId }, {
             $set: { fileArray: newFiles }
         }).then(resp => {
 
@@ -56,31 +57,13 @@ exports.uploadFile = (req, res, next) => {
 
     });
 };
-// create a empty file object in database on register of user
-exports.createFile = async (req, res) => {
-    try {
-        let userExist = await FileUpload.findOne({ user: req.body.user });
-        if (userExist) {
-            res.status(202).send("user exist");
-            return;
-        }
-        const createFile = new FileUpload({
-            user: req.body.user,
-            fileArray: []
-        });
 
-        await createFile.save();
-        res.status(200).json({ data: createFile });
-    } catch (error) {
-        console.log(error);
-
-    }
-}
 
 // get all files of a specific user
 exports.getFiles = async (req, res) => {
+
     try {
-        let userData = await FileUpload.findOne({ _id: req.query.id });
+        let userData = await FileUpload.findOne({ user: req.userId });
 
         res.status(200).json({ data: userData });
     } catch (error) {
@@ -88,19 +71,6 @@ exports.getFiles = async (req, res) => {
 
     }
 }
-
-// get all files and details of user
-exports.getUser = async (req, res) => {
-    try {
-        let userData = await FileUpload.findOne({ user: req.query.id }).populate("user");
-
-        res.status(200).json({ data: userData });
-    } catch (error) {
-        console.log(error);
-
-    }
-}
-
 
 // to download any file from s3 bucket
 exports.downloadFile = async (req, res) => {

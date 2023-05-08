@@ -17,8 +17,9 @@ export default function LoginUser() {
 
     const onSuccess = async (res) => {
         console.log("Login Success! current USER :", res.profileObj);
-        localStorage.setItem("profileImage", res.profileObj.imageUrl);
+        localStorage.setItem("userName", res.profileObj.name);
         setProfileImage(res.profileObj.imageUrl);
+        setUserName(res.profileObj.name);
         const user = {
             email: res.profileObj.email,
             name: res.profileObj.name,
@@ -28,46 +29,10 @@ export default function LoginUser() {
         try {
             await postApiRequest(`/signUp`, user).then(async (resp) => {
 
-                if (resp.message == "user exist") {
-                    let id = resp.data._id;
-                    console.log(id);
-                    await getApiRequest(`/getUser?id=${id}`).then(resp => {
-                        console.log(resp.data.user);
-                        localStorage.setItem("userId", resp.data._id);
-                        localStorage.setItem("userName", resp.data.user.name);
-
-                        setUserName(resp.data.user.name);
-                        localStorage.setItem("navShow", "true");
-                        setNavbarShow(!navbarShow);
-                        history("/showFiles");
-                    }, err => {
-                        console.log(err);
-                    });
-
-                }
-                else {
-                    let userFile = {
-                        user: resp.data._id,
-                    }
-                    await postApiRequest(`/createFile`, userFile).then(resp => {
-                        console.log(resp);
-                        localStorage.setItem("userId", resp.data._id);
-                        localStorage.setItem("navShow", "true");
-                        setUserName(res.profileObj.name);
-                        setNavbarShow(!navbarShow);
-                        history("/showFiles");
-
-                    }, err => {
-                        console.log(err);
-                    });
-
-                }
-
-
-
-
-
-
+                localStorage.setItem("tokens", resp.accessToken);
+                history("/showFiles");
+                localStorage.setItem("navShow", "true");
+                setNavbarShow(!navbarShow);
 
             }).catch(err => {
                 if (err.response.data === "Unauthorized") {

@@ -6,22 +6,29 @@ import axios from "axios";
 import FileDownload from 'js-file-download'
 
 
-const ShowImages = () => {
+const ShowFiles = () => {
     const history = useNavigate();
     const [fileData, setFileData] = React.useState();
     React.useEffect(() => {
-        getAllImages();
+        getAllFiles();
     }, [0])
-    const getAllImages = async () => {
-        let id = localStorage.getItem("userId")
-        await getApiRequest(`/getFiles?id=${id}`).then(resp => {
+    const getAllFiles = async () => {
+        await getApiRequest(`/getFiles`).then(resp => {
             console.log(resp.data);
             setFileData(resp.data);
         });
     }
 
     const downloadFile = async (key) => {
-        const res = await axios.get(`http://localhost:9000/api/downloadFile?key=${key}`, { responseType: 'blob' }).then(resp => {
+        const res = await axios.get(`http://localhost:9000/api/downloadFile?key=${key}`,
+            {
+                responseType: `blob`,
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("tokens")}`
+                }
+            },
+
+        ).then(resp => {
             FileDownload(resp.data, key)
         });
 
@@ -47,7 +54,7 @@ const ShowImages = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {fileData?.fileArray?.map((files, index) => <tr key={files._id}>
+                    {fileData?.fileArray?.map((files, index) => <tr key={index}>
                         <th scope="row">{index + 1}</th>
                         <th>{files.fileName}</th>
                         <th>{files.fileSize}</th>
@@ -72,4 +79,4 @@ const ShowImages = () => {
     )
 }
 
-export default ShowImages;
+export default ShowFiles;

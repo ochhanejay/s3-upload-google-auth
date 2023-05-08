@@ -1,5 +1,8 @@
-const bcrypt = require('bcrypt');
 const User = require("../models/userModel");
+const FileUpload = require("../models/fileUploadModel.js");
+
+const jwt = require('jsonwebtoken');
+
 
 
 exports.signUp = async (req, res) => {
@@ -7,33 +10,50 @@ exports.signUp = async (req, res) => {
         let newUser;
         let user = req.body.email;
         let userExist = await User.findOne({ email: user });
-        console.log(userExist);
         if (userExist) {
-            res.status(202).json({ data: userExist, message: "user exist" });
+            const accessToken = jwt.sign(
+                {
+                    "UserInfo": {
+                        "email": user,
+                        "id": userExist._id
+
+                    }
+                },
+                process.env.ACCESS_TOKEN_SECRET,
+                { expiresIn: '1d' }
+            );
+            res.cookie('jwt', accessToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
+            res.status(202).json({ data: userExist, accessToken, message: "user exist" });
             return;
         }
-        if (req.body.password) {
 
-            const hashedPwd = await bcrypt.hash(req.body.password, 10);
-            newUser = await new User({
+        newUser = await new User({
+            name: req.body.name,
+            email: req.body.email,
+            profileImg: req.body.profileImg
+        });
 
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                email: req.body.email,
-                password: hashedPwd
-            });
-        }
-        else {
-            newUser = await new User({
 
-                name: req.body.name,
-                email: req.body.email,
-                profileImg: req.body.profileImg
-            });
-        }
+        await newUser.save();
+        const createFile = new FileUpload({
+            user: newUser._id,
+            fileArray: []
+        });
 
-        newUser.save();
-        res.status(200).json({ data: newUser });
+        await createFile.save();
+        const accessToken = jwt.sign(
+            {
+                "UserInfo": {
+                    "email": user,
+                    "id": newUser._id
+
+                }
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: '1d' }
+        );
+        res.cookie('jwt', accessToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
+        res.status(200).json({ data: newUser, accessToken });
     }
     catch (error) {
         console.log(error)

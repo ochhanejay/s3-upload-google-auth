@@ -42,7 +42,7 @@ export const putApiRequest = async (endPoint, params) => {
     try {
         const res = await axios.put(serverUrl + endPoint, params, {
             headers: {
-                "x-access-token": sessionStorage.getItem("token"),
+                Authorization: `Bearer ${localStorage.getItem("tokens")}`
             },
         });
         // console.log("putApiRequest=>", res);
@@ -58,7 +58,7 @@ export const deleteApiRequest = async (endPoint) => {
     try {
         const res = await axios.delete(serverUrl + endPoint, {
             headers: {
-                "x-access-token": sessionStorage.getItem("token"),
+                Authorization: `Bearer ${localStorage.getItem("tokens")}`
             },
         });
         // console.log("deleteApiRequest=>", res);

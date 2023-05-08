@@ -3,7 +3,7 @@ import * as React from 'react';
 import SignIn from './components/login/login';
 import { Route, Routes } from 'react-router';
 import Navbar from './components/screens/appBar';
-import ShowImages from './components/screens/showFiles';
+import ShowFiles from './components/screens/showFiles';
 import "bootstrap/dist/css/bootstrap.css";
 import { gapi } from "gapi-script";
 import CknContext, { authContext } from './context/context';
@@ -37,7 +37,7 @@ function App() {
         <Route path="/" element={<SignIn />} />
         <Route path="/appBar" element={<Navbar />} />
         <Route path="/uploadFile" element={<UploadFile />} />
-        <Route path="/showFiles" element={<ShowImages />} />
+        <Route path="/showFiles" element={<ShowFiles />} />
         <Route path="*" element={<div>404 not found</div>} />
       </Routes>
     </div>

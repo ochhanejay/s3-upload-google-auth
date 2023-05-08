@@ -14,5 +14,4 @@ app.get("/", (req, res) =>
 );
 
 app.use("/api", userRouter);
-userRouter.use("/uploads", express.static("uploads"));
 module.exports = app;

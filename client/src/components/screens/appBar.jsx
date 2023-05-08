@@ -65,13 +65,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function Navbar() {
   React.useEffect(() => {
     setUserName(localStorage.getItem("userName"));
-    setProfileImage(localStorage.getItem("profileImage"))
   }, []);
   const onSuccess = () => {
     setNavbarShow(!navbarShow);
     localStorage.removeItem("navShow");
     localStorage.removeItem("userId");
-    localStorage.removeItem("profileImage");
     localStorage.removeItem("userName");
     setUserName("");
     history("/");
@@ -199,6 +197,7 @@ export default function Navbar() {
       <AppBar position="static" sx={{ backgroundColor: "#06283D", }}>
         <Toolbar>
           <IconButton
+            hidden
             size="large"
             edge="start"
             color="inherit"
@@ -264,7 +263,7 @@ export default function Navbar() {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <img src={profileImage} style={{ width: "3rem", borderRadius: "5rem" }} alt="fknk"></img>
+              <img src="https://res.cloudinary.com/practicaldev/image/fetch/s--_HBZhuhF--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://thepracticaldev.s3.amazonaws.com/i/nweeqf97l2md3tlqkjyt.jpg" style={{ width: "3rem", height: "3rem", borderRadius: "5rem" }} alt="fknk"></img>
 
             </IconButton>
           </Box>

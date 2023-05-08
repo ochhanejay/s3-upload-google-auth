@@ -24,7 +24,7 @@ const UploadFile = () => {
   const history = useNavigate();
 
 
-  const onUploadMultiple = async () => {
+  const onUploadFile = async () => {
     if (!singleFile) {
       return;
     }
@@ -36,7 +36,11 @@ const UploadFile = () => {
 
       let userId = localStorage.getItem("userId")
 
-      await axios.put(`http://localhost:9000/api/uploadFile?id=${userId}`, formData).then(resp => {
+      await axios.put(`http://localhost:9000/api/uploadFile`, formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("tokens")}`
+        },
+      }).then(resp => {
         console.log(resp)
         history("/showFiles");
       });
@@ -82,7 +86,7 @@ const UploadFile = () => {
               variant="contained"
               component="label"
               color="secondary"
-              onClick={onUploadMultiple}
+              onClick={onUploadFile}
             >
               Upload File
 
